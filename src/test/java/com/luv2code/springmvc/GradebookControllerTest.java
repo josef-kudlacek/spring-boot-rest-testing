@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @TestPropertySource("/application-test.properties")
@@ -135,5 +136,21 @@ public class GradebookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void createStudentHttpRequest() throws Exception {
+        collegeStudent.setFirstname("Chad");
+        collegeStudent.setLastname("Darby");
+        collegeStudent.setEmailAddress("chad.darby@luv2code_school.com");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(collegeStudent)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)));
+
+        CollegeStudent verifyStudent = studentDao.findByEmailAddress("chad.darby@luv2code_school.com");
+        assertNotNull(verifyStudent, "Student should be valid.");
     }
 }
